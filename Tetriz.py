@@ -116,7 +116,47 @@ def main():
     running = True
     game_over = False
 
-    
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN and not game_over:
+                if event.key == pygame.K_LEFT:
+                    current_block.move_left()
+                    if check_collision(grid, current_block):
+                        current_block.move_right()
+                elif event.key == pygame.K_RIGHT:
+                    current_block.move_right()
+                    if check_collision(grid, current_block):
+                        current_block.move_left()
+                elif event.key == pygame.K_DOWN:
+                    current_block.move_down()
+                    if check_collision(grid, current_block):
+                        current_block.move_up()
+                elif event.key == pygame.K_SPACE:
+                    current_block.rotate()
+                    if check_collision(grid, current_block):
+                        current_block.rotate_back()
+        
+        if not game_over:
+            current_block.move_down()
+            if check_collision(grid, current_block):
+                current_block.move_up()
+                merge_grid(grid, current_block)
+                clear_rows(grid)
+                current_block = Block(random.choice(SHAPES), random.choice([RED, BLUE, GREEN, YELLOW]))
+                if check_collision(grid, current_block):
+                    game_over = True
+
+        screen.fill(BLACK)
+        draw_grid(screen, grid)
+        current_block.draw(screen)
+
+        if game_over:
+            draw_game_over(screen)
+
+        pygame.display.flip()
+        clock.tick(FPS)
 
     pygame.quit()
 
